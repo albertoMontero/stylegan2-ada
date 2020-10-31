@@ -1,1 +1,7 @@
 __pycache__/
+data/
+images/
+models/
+out/
+results/
+

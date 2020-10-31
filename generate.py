@@ -21,7 +21,7 @@ import dnnlib.tflib as tflib
 
 #----------------------------------------------------------------------------
 
-def generate_images(network_pkl, seeds, truncation_psi, outdir, class_idx, dlatents_npz):
+def generate_images(network_pkl, seeds, truncation_psi, outdir, class_idx, dlatents_npz, prefix):
     tflib.init_tf()
     print('Loading networks from "%s"...' % network_pkl)
     with dnnlib.util.open_url(network_pkl) as fp:
@@ -60,7 +60,13 @@ def generate_images(network_pkl, seeds, truncation_psi, outdir, class_idx, dlate
         z = rnd.randn(1, *Gs.input_shape[1:]) # [minibatch, component]
         tflib.set_vars({var: rnd.randn(*var.shape.as_list()) for var in noise_vars}) # [height, width]
         images = Gs.run(z, label, **Gs_kwargs) # [minibatch, height, width, channel]
-        PIL.Image.fromarray(images[0], 'RGB').save(f'{outdir}/seed{seed:04d}.png')
+
+        if prefix is None:
+            fname = f'{outdir}/seed{seed:04d}.png'
+        else:
+            fname = f'{outdir}/{prefix}seed{seed:04d}.png'
+
+        PIL.Image.fromarray(images[0], 'RGB').save(fname)
 
 #----------------------------------------------------------------------------
 
@@ -111,6 +117,7 @@ def main():
     parser.add_argument('--trunc', dest='truncation_psi', type=float, help='Truncation psi (default: %(default)s)', default=0.5)
     parser.add_argument('--class', dest='class_idx', type=int, help='Class label (default: unconditional)')
     parser.add_argument('--outdir', help='Where to save the output images', required=True, metavar='DIR')
+    parser.add_argument('--prefix', dest='prefix', help='Add prefix to image name', required=False, default=None)
 
     args = parser.parse_args()
     generate_images(**vars(args))
