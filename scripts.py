@@ -17,7 +17,7 @@ def calc_metrics_dir(path, metric_names, metricdata, mirror=True, gpus=1, revers
     print(path)
     networks = [p for p in path.glob("*.pkl")]
     networks = sorted(networks, reverse=reverse)
-    print(networks)
+    print("total networks in folder: ", len(networks))
 
     if first:
         assert 1 <= first <= len(networks), f"first must be between 1 and {len(networks)}"
