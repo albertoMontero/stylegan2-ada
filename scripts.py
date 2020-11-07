@@ -1,6 +1,4 @@
 from calc_metrics import calc_metrics
-import glob
-import os
 from pathlib import Path
 
 
