@@ -2,10 +2,13 @@ from calc_metrics import calc_metrics
 from pathlib import Path
 
 
-def calc_metrics_dir(path, metric_names, metricdata, mirror=True, gpus=1, reverse=True, first=None):
-
+def calc_metrics_dir(path, metric_names, metricdata, mirror, gpus=1, n=None, start=None, end=None,
+                     reverse=True):
     """
-    calc_metric for networks contained in directory. Optionally, select first networks (or last if reverse is true).
+
+    calc_metric for networks contained in directory. Optionally, select n last/first snapshots (reverse True/False),
+    or by start and end with network-snapshot numbers (sorted based on reverse).
+
     """
 
     if not isinstance(metric_names, list):
@@ -13,22 +16,41 @@ def calc_metrics_dir(path, metric_names, metricdata, mirror=True, gpus=1, revers
 
     path = Path(path)
     print(path)
-    networks = [p for p in path.glob("*.pkl")]
-    networks = sorted(networks, reverse=reverse)
-    print("total networks in folder: ", len(networks))
+    _networks = [p for p in path.glob("*.pkl")]
+    _networks = sorted(_networks, reverse=reverse)
 
-    if first:
-        assert 1 <= first <= len(networks), f"first must be between 1 and {len(networks)}"
-        networks = networks[:first]
+    if len(_networks) == 0:
+        print(f"No networks found in {path}")
+        return
 
-    print(f"Calculating metrics {metric_names} for:\n{[n.name for n in networks]}")
+    print("total networks in folder: ", len(_networks))
+    info = None
+
+    if n:
+        networks = _networks[:n]
+        if reverse:
+            info = f"Calculating metrics {metric_names} for last {n} networks:\n{[n.name for n in networks]}"
+        else:
+            info = f"Calculating metrics {metric_names} for first {n} networks:\n{[n.name for n in networks]}"
+    elif start and end:
+        networks = []
+        for ns in _networks:
+            tick = int(ns.name.split(".")[0].split("-")[-1])
+            if start <= tick <= end:
+                networks.append(ns)
+    else:
+        networks = _networks
+
+    if not info:
+        info = f"Calculating metrics {metric_names} for networks:\n{[n.name for n in networks]}"
+
+    print(info)
 
     for ns in networks:
         calc_metrics(str(ns), metric_names, metricdata, mirror, gpus)
 
 
 if __name__ == "__main__":
-
-    path = "/home/alberto/Data/github/stylegan2-ada/models/trv_test"
+    path = "/home/alberto/Data/github/stylegan2-ada/models/test"
     data = "/home/alberto/Data/github/stylegan2-ada/data/trv_s128"
-    calc_metrics_dir(path, "fid50k_full", data, first=2)
+    calc_metrics_dir(path, "fid50k_full", data, True, n=3, start=2, end=4, reverse=False)
