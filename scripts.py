@@ -51,6 +51,17 @@ def calc_metrics_dir(path, metric_names, metricdata, mirror, gpus=1, n=None, sta
 
 
 if __name__ == "__main__":
-    path = "/home/alberto/Data/github/stylegan2-ada/models/test"
-    data = "/home/alberto/Data/github/stylegan2-ada/data/trv_s128"
-    calc_metrics_dir(path, "fid50k_full", data, True, n=3, start=2, end=4, reverse=False)
+    # path = "/home/alberto/Data/github/stylegan2-ada/models/trv"
+    # data = "/home/alberto/Data/github/stylegan2-ada/data/trv_s128"
+    # calc_metrics_dir(path, ["fid50k_full", "pr50k3_full"], data, True, n=3, start=2, end=4, reverse=False)
+
+    # path = "/home/alberto/Data/master/TFM/tmp"
+    # data = "/home/alberto/Data/master/TFM/usbrains/data/processed/colab_2/tf_records/dbp/"
+    # calc_metrics_dir(path, ["fid50k_full"], data, False, n=1, reverse=True)
+
+
+    path = "/home/alberto/Data/github/stylegan2-ada/models/bl2/dbp/s2"
+    data = "/home/alberto/Data/github/stylegan2-ada/data/bl2/dbp"
+    # calc_metrics_dir(path, ["fid50k_full"], data, False, n=1, reverse=True)
+    # calc_metrics_dir(path, ["pr50k3_full"], data, False, n=1, reverse=True)
+    calc_metrics_dir(path, ["fid50k_full"], data, False, start=589, end=589, reverse=False)
