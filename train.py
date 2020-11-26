@@ -164,6 +164,7 @@ def setup_training_options(
         'usb128_2':      dict(ref_gpus=1,  kimg=25000,  mb=32, mbstd=4,  fmaps=0.5, lrate=0.0025, gamma=0.08, ema=10,  ramp=None, map=8),
         'usb64_1':       dict(ref_gpus=1,  kimg=25000,  mb=16, mbstd=4,  fmaps=0.5, lrate=0.0025, gamma=0.16, ema=10,  ramp=None, map=8),
         'auto':          dict(ref_gpus=-1, kimg=25000,  mb=-1, mbstd=-1, fmaps=-1,  lrate=-1,     gamma=-1,   ema=-1,  ramp=0.05, map=2), # populated dynamically based on 'gpus' and 'res'
+        'auto_map8':     dict(ref_gpus=-1, kimg=25000,  mb=-1, mbstd=-1, fmaps=-1,  lrate=-1,     gamma=-1,   ema=-1,  ramp=None, map=8),
         'stylegan2':     dict(ref_gpus=8,  kimg=25000,  mb=32, mbstd=4,  fmaps=1,   lrate=0.002,  gamma=10,   ema=10,  ramp=None, map=8), # uses mixed-precision, unlike original StyleGAN2
         'paper256':      dict(ref_gpus=8,  kimg=25000,  mb=64, mbstd=8,  fmaps=0.5, lrate=0.0025, gamma=1,    ema=20,  ramp=None, map=8),
         'paper512':      dict(ref_gpus=8,  kimg=25000,  mb=64, mbstd=8,  fmaps=1,   lrate=0.0025, gamma=0.5,  ema=20,  ramp=None, map=8),
@@ -533,7 +534,7 @@ def main():
     group.add_argument('--metricdata', help='Dataset to evaluate metrics against (optional)', metavar='PATH')
 
     group = parser.add_argument_group('base config')
-    group.add_argument('--cfg',   help='Base config (default: auto)', choices=['usb128_1', 'usb128_2', 'usb64_1', 'auto', 'stylegan2', 'paper256', 'paper512', 'paper1024', 'cifar', 'cifarbaseline'])
+    group.add_argument('--cfg',   help='Base config (default: auto)', choices=['usb128_1', 'usb128_2', 'usb64_1', 'auto', 'auto_map8', 'stylegan2', 'paper256', 'paper512', 'paper1024', 'cifar', 'cifarbaseline'])
     group.add_argument('--gamma', help='Override R1 gamma', type=float, metavar='FLOAT')
     group.add_argument('--kimg',  help='Override training duration', type=int, metavar='INT')
 
