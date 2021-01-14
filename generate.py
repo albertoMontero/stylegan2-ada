@@ -50,6 +50,7 @@ def generate_images(network_pkl, seeds, truncation_psi, outdir, class_idx, dlate
     }
     if truncation_psi is not None:
         Gs_kwargs['truncation_psi'] = truncation_psi
+        print("using tpsi: ", truncation_psi)
 
     noise_vars = [var for name, var in Gs.components.synthesis.vars.items() if name.startswith('noise')]
     label = np.zeros([1] + Gs.input_shapes[1][1:])
@@ -74,20 +75,20 @@ def generate_images(network_pkl, seeds, truncation_psi, outdir, class_idx, dlate
 
 
 def prepare_train_set(trv_ns_path, dbp_ns_path, gan_seeds, truncation_psi, outdir, class_idx=None, dlatents_npz=None,
-                      prefix=None, baseline_path=None):
+                      baseline_path=None):
 
     if not isinstance(gan_seeds, dict):
-        gan_seeds = {"trv": gan_seeds, "dbp": gan_seeds}
+        gan_seeds = {"trv": _parse_num_range(gan_seeds), "dbp": _parse_num_range(gan_seeds)}
 
     print(f"\tSeeds for trv: {gan_seeds['trv']}")
-    generate_images(trv_ns_path, gan_seeds["trv"], truncation_psi, outdir, class_idx, dlatents_npz, prefix)
+    generate_images(trv_ns_path, _parse_num_range(gan_seeds["trv"]), truncation_psi, outdir, class_idx, dlatents_npz, "trv_")
 
     print(f"\tSeeds for dbp: {gan_seeds['dbp']}")
-    generate_images(dbp_ns_path, gan_seeds["dbp"], truncation_psi, outdir, class_idx, dlatents_npz, prefix)
+    generate_images(dbp_ns_path, _parse_num_range(gan_seeds["dbp"]), truncation_psi, outdir, class_idx, dlatents_npz, "dbp_")
 
     if baseline_path:
         print("copying baseline images")
-        size = copy_images(baseline_path / "images", outdir)
+        size = copy_images(baseline_path / "images", pathlib.Path(outdir))
         print(f"copying baseline images done. {size} files copied")
 
 
