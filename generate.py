@@ -10,8 +10,10 @@
 
 import argparse
 import os
+import pathlib
 import pickle
 import re
+import shutil
 
 import numpy as np
 import PIL.Image
@@ -69,6 +71,39 @@ def generate_images(network_pkl, seeds, truncation_psi, outdir, class_idx, dlate
         PIL.Image.fromarray(images[0], 'RGB').save(fname)
 
 #----------------------------------------------------------------------------
+
+
+def prepare_train_set(trv_ns_path, dbp_ns_path, gan_seeds, truncation_psi, outdir, class_idx=None, dlatents_npz=None,
+                      prefix=None, baseline_path=None):
+
+    if not isinstance(gan_seeds, dict):
+        gan_seeds = {"trv": gan_seeds, "dbp": gan_seeds}
+
+    print(f"\tSeeds for trv: {gan_seeds['trv']}")
+    generate_images(trv_ns_path, gan_seeds["trv"], truncation_psi, outdir, class_idx, dlatents_npz, prefix)
+
+    print(f"\tSeeds for dbp: {gan_seeds['dbp']}")
+    generate_images(dbp_ns_path, gan_seeds["dbp"], truncation_psi, outdir, class_idx, dlatents_npz, prefix)
+
+    if baseline_path:
+        print("copying baseline images")
+        size = copy_images(baseline_path / "images", outdir)
+        print(f"copying baseline images done. {size} files copied")
+
+
+def copy_images(src_path, dst_path):
+    files = [img.name for img in get_files(src_path)]
+    for img in files:
+        shutil.copy(src_path / img, dst_path / img)
+
+    return len(files)
+
+
+def get_files(path, ext=".png"):
+    path = pathlib.Path(path)
+    files = [f for f in path.ls() if f.name.endswith(ext)]
+    return files
+
 
 def _parse_num_range(s):
     '''Accept either a comma separated list of numbers 'a,b,c' or a range 'a-c' and return as a list of ints.'''
